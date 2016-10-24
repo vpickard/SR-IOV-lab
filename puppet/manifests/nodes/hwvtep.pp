@@ -1,0 +1,1 @@
+node hwvtep inherits servernode {}

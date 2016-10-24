@@ -9,7 +9,7 @@ from mininet.util import dumpNodeConnections
 
 
 def createTopology(switch, hosts):
-    ODL_Controller_IP='172.17.40.4'
+    ODL_Controller_IP='127.0.0.1'
     setLogLevel('info')
     topo = Topo()
     switch = topo.addSwitch(switch)

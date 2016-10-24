@@ -2,51 +2,89 @@ node basenode {
 
   exec { "apt_get_update":
     command => "/usr/bin/apt-get -y update"
+    # command => "/usr/bin/apt-get -y install dh-autoreconf"
   }
+  
+
 
   # Ensure the above command runs before we attempt
   # to install any package in other manifests
   Exec["apt_get_update"] -> Package<| |>
 
-  package { "unzip":
+  $base_packages = [
+                     "git",
+                     "autoconf",
+                     "automake1.10",
+                     "build-essential",
+                     "debhelper",
+                     "dh-autoreconf",
+                     "fakeroot",
+                     "libffi-dev",
+                     "libssl-dev",
+                     "libtool",
+                     "pkg-config",
+                     "python-all",
+                     "python-qt4",
+                     "python-zopeinterface",
+                     "python-twisted-conch"
+                   ]
+
+  package { $base_packages:
     ensure => installed,
   }
 
   exec { "download_ovs":
-    command => "/usr/bin/wget https://www.dropbox.com/sh/k5t492id6hc6ynf/AAA2GzeOowsf7Kdjv6eC5Yfca?dl=1 -O /vagrant/shared/ovs.zip",
+    #command => "/usr/bin/wget https://github.com/openvswitch/ovs/archive/v2.3.tar.gz -O /root/ovs.tar.gz",
+    #command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.3.3.tar.gz -O /root/ovs.tar.gz",
+    #command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.5.0.tar.gz -O /root/ovs.tar.gz",
+    command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.4.0.tar.gz -O /root/ovs.tar.gz",
     cwd     => "/root",
-    creates => "/vagrant/shared/ovs.zip",
+    creates => "/root/ovs.tar.gz",
+  }
+
+  file { "/root/ovs":
+    ensure => directory,
   }
 
   exec { "extract_ovs":
-    command => "/usr/bin/unzip /vagrant/shared/ovs.zip -d /vagrant/shared/ovs",
-    cwd     => "/vagrant/shared",
+    command => "/bin/tar xvfz ovs.tar.gz -C /root/ovs --strip-components=1",
+    cwd     => "/root",
     require => [
-                  Package["unzip"],
                   Exec["download_ovs"],
                ],
-    returns => [0, 2],
-    creates => "/vagrant/shared/ovs/openvswitch-common_2.3.0-1_amd64.deb",
+    creates => "/root/ovs/README",
+  }
+
+  exec { "build_ovs":
+    command     => "/usr/bin/fakeroot debian/rules binary",
+    environment => "DEB_BUILD_OPTIONS='parallel=8 nocheck'",
+    cwd         => "/root/ovs",
+    logoutput   => true,
+    loglevel    => verbose,
+    timeout     => 0,
+    creates     => "/root/openvswitch-common_2.4.0-1_amd64.deb",
+    require     => [
+                     Package["build-essential"],
+                     Package["fakeroot"],
+                     Package[$base_packages],
+                     Exec["extract_ovs"],
+                   ],
   }
 
   package { "ovs_common":
     name     =>  "openvswitch-common",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/vagrant/shared/ovs/openvswitch-common_2.3.0-1_amd64.deb",
-    require  => [
-                   Exec["extract_ovs"],
-                ]
+    source   =>  "/root/openvswitch-common_2.4.0-1_amd64.deb",
+    require  => [ Exec["build_ovs"] ],
   }
 
   package { "ovs_switch":
     name     =>  "openvswitch-switch",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/vagrant/shared/ovs/openvswitch-switch_2.3.0-1_amd64.deb",
-    require  => [
-                  Package["ovs_common"],
-                ],
+    source   =>  "/root/openvswitch-switch_2.4.0-1_amd64.deb",
+    require  => [ Package["ovs_common"] ],
   }
 
 }
@@ -59,20 +97,16 @@ node servernode inherits basenode {
     name     =>  "python-openvswitch",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/vagrant/shared/ovs/python-openvswitch_2.3.0-1_all.deb",
-    require  => [
-                  Package["ovs_common"],
-                ],
+    source   =>  "/root/python-openvswitch_2.4.0-1_all.deb",
+    require  => [ Package["ovs_switch"] ],
   }
 
   package { "ovs_vtep":
     name     =>  "openvswitch-vtep",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/vagrant/shared/ovs/openvswitch-vtep_2.3.0-1_amd64.deb",
-    require  => [
-                  Package["ovs_python"],
-                ],
+    source   =>  "/root/openvswitch-vtep_2.4.0-1_amd64.deb",
+    require  => [ Package["ovs_python"] ],
   }
 
   package { "mininet":

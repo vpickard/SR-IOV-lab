@@ -4,7 +4,7 @@ from common import createTopology
 
 
 createTopology(
-    's2',
+    's1',
     [
         [
             'red2',
