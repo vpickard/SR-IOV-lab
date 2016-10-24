@@ -4,6 +4,16 @@ SR-IOV Lab
 This is a companion project to the Open vSwitch series of articles at
 http://www.relaxdiego.com.
 
+Network Topology
+----------------
+We will build a Vagrant file to build a portion of the network in the SR-IOV.pdf file. 
+Specifically, we will build:
+
+1. A VM for the Compute Node (SR-IOV enabled). Middle compute node in the diagram.
+2. A VM for HWVTEP emulator. This is TOR in the diagram.
+3. A VM for Compute Node (not SR-IOV enabled). Left compute node in the diagram.
+
+
 
 Requirements
 ------------
