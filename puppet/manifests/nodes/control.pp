@@ -1,0 +1,1 @@
+node control inherits basenode {}

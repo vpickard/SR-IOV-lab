@@ -1,1 +1,2 @@
-node hwvtep inherits servernode {}
+node hwvtep inherits hwvtepnode {}
+

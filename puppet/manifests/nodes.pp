@@ -36,8 +36,8 @@ node basenode {
   exec { "download_ovs":
     #command => "/usr/bin/wget https://github.com/openvswitch/ovs/archive/v2.3.tar.gz -O /root/ovs.tar.gz",
     #command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.3.3.tar.gz -O /root/ovs.tar.gz",
-    #command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.5.0.tar.gz -O /root/ovs.tar.gz",
-    command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.4.0.tar.gz -O /root/ovs.tar.gz",
+    command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.5.0.tar.gz -O /root/ovs.tar.gz",
+    #command => "/usr/bin/wget http://openvswitch.org/releases/openvswitch-2.4.0.tar.gz -O /root/ovs.tar.gz",
     cwd     => "/root",
     creates => "/root/ovs.tar.gz",
   }
@@ -62,7 +62,7 @@ node basenode {
     logoutput   => true,
     loglevel    => verbose,
     timeout     => 0,
-    creates     => "/root/openvswitch-common_2.4.0-1_amd64.deb",
+    creates     => "/root/openvswitch-common_2.5.0-1_amd64.deb",
     require     => [
                      Package["build-essential"],
                      Package["fakeroot"],
@@ -75,7 +75,7 @@ node basenode {
     name     =>  "openvswitch-common",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/root/openvswitch-common_2.4.0-1_amd64.deb",
+    source   =>  "/root/openvswitch-common_2.5.0-1_amd64.deb",
     require  => [ Exec["build_ovs"] ],
   }
 
@@ -83,7 +83,7 @@ node basenode {
     name     =>  "openvswitch-switch",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/root/openvswitch-switch_2.4.0-1_amd64.deb",
+    source   =>  "/root/openvswitch-switch_2.5.0-1_amd64.deb",
     require  => [ Package["ovs_common"] ],
   }
 
@@ -91,13 +91,13 @@ node basenode {
 
 
 
-node servernode inherits basenode {
+node hwvtepnode inherits basenode {
 
   package { "ovs_python":
     name     =>  "python-openvswitch",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/root/python-openvswitch_2.4.0-1_all.deb",
+    source   =>  "/root/python-openvswitch_2.5.0-1_all.deb",
     require  => [ Package["ovs_switch"] ],
   }
 
@@ -105,7 +105,7 @@ node servernode inherits basenode {
     name     =>  "openvswitch-vtep",
     ensure   =>  installed,
     provider =>  dpkg,
-    source   =>  "/root/openvswitch-vtep_2.4.0-1_amd64.deb",
+    source   =>  "/root/openvswitch-vtep_2.5.0-1_amd64.deb",
     require  => [ Package["ovs_python"] ],
   }
 

@@ -11,7 +11,7 @@ Specifically, we will build:
 
 1. A VM for the Compute Node (SR-IOV enabled). Middle compute node in the diagram.
 2. A VM for HWVTEP emulator. This is TOR in the diagram.
-3. A VM for Compute Node (not SR-IOV enabled). Left compute node in the diagram.
+3. A VM that has Control/Compute Node (not SR-IOV enabled). Left control/compute node in the diagram.
 
 
 

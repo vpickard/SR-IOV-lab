@@ -1,1 +1,0 @@
-node internet inherits basenode {}
