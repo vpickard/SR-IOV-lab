@@ -89,6 +89,20 @@ node basenode {
 
 }
 
+node devStack inherits basenode {
+
+  #file { '/opt/devstack':
+  #   ensure => 'directory',
+  #   owner  => 'root'
+  #}
+
+  exec { "download_devstack":
+    cwd     => "/opt/",
+    creates => "/opt/devstack",
+    command => "/usr/bin/git clone https://git.openstack.org/openstack-dev/devstack -b stable/mitaka "
+  }
+}
+
 
 
 node hwvtepnode inherits basenode {

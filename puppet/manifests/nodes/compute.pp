@@ -1,1 +1,1 @@
-node compute inherits basenode {}
+node compute inherits devStack {}

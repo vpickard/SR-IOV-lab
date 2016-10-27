@@ -29,7 +29,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Control node tunnel transport network
     server.vm.network "private_network",
-                      libvirt__network_name: "vxlan_net",
+                      :libvirt__network_name => 'vxlan_net',
+                      :libvirt__forward_mode => 'none',
                       ip: DS_CONTROL_TUNNEL_IP,
                       netmask: "255.255.255.0"
 
@@ -52,31 +53,32 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
   # Compute
-  #config.vm.define "compute" do |server|
-  #  server.vm.hostname = "compute"
+#  config.vm.define "compute" do |server|
+#    server.vm.hostname = "compute"
 
     # Tunnel transport network
-    #server.vm.network "private_network",
-    #                  virtualbox__intnet: "server1_net",
-    #                  ip: COMPUTE_TUNNEL_IP,
-    #                  netmask: "255.255.255.0"
+#    server.vm.network "private_network",
+#                      :libvirt__network_name => 'vxlan_net',
+#                      :libvirt__forward_mode => 'none',
+#                      ip: DS_COMPUTE_TUNNEL_IP,
+#                      netmask: "255.255.255.0"
 
     # Management/Control network
-    #server.vm.network "private_network",
-    #                  ip: COMPUTE_MGMT_IP,
-    #                  netmask: "255.255.255.0"
+#    server.vm.network "private_network",
+#                      ip: DS_COMPUTE_MGMT_IP,
+#                      netmask: "255.255.255.0"
 
-    #server.vm.provider "libvirt" do |lv|
-    #  lv.memory = 2048
-    #  lv.cpus = 2
-    #end
+#    server.vm.provider "libvirt" do |lv|
+#      lv.memory = 2048
+#      lv.cpus = 2
+#    end
 
-    #server.vm.provision "puppet" do |puppet|
-    #  puppet.manifests_path = "puppet/manifests"
-    #  puppet.manifest_file  = "site.pp"
-    #  puppet.options = "--verbose --debug"
-    #end
-  #end
+#    server.vm.provision "puppet" do |puppet|
+#      puppet.manifests_path = "puppet/manifests"
+#      puppet.manifest_file  = "site.pp"
+#      puppet.options = "--verbose --debug"
+#    end
+#  end
 
   # HWVTEP
   config.vm.define "hwvtep" do |hwvtep|
@@ -84,7 +86,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Tunnel transport network
     hwvtep.vm.network "private_network",
-                      libvirt__network_name: "vxlan_net",
+                      :libvirt__network_name => 'vxlan_net',
+                      :libvirt__forward_mode => 'none',
                       ip: HWVTEP_TUNNEL_IP,
                       netmask: "255.255.255.0"
 

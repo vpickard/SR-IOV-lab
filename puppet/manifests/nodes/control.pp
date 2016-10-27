@@ -1,1 +1,1 @@
-node control inherits basenode {}
+node control inherits devStack {}
