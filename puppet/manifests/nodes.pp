@@ -22,6 +22,7 @@ node basenode {
                      "libffi-dev",
                      "libssl-dev",
                      "libtool",
+                     "vlan",
                      "pkg-config",
                      "python-all",
                      "python-qt4",
@@ -99,7 +100,8 @@ node devStack inherits basenode {
   exec { "download_devstack":
     cwd     => "/opt/",
     creates => "/opt/devstack",
-    command => "/usr/bin/git clone https://git.openstack.org/openstack-dev/devstack -b stable/mitaka "
+    #command => "/usr/bin/git clone https://git.openstack.org/openstack-dev/devstack -b stable/mitaka "
+    command => "/usr/bin/git clone https://git.openstack.org/openstack-dev/devstack -b master "
   }
 }
 

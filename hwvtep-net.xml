@@ -1,0 +1,8 @@
+<network>
+  <name>hwvtep-net</name>
+  <uuid>8f71e395-56ce-4348-8cc0-cc31b364a71a</uuid>
+  <forward mode='bridge'/>
+  <bridge name='br-hwvtep'/>
+  <virtualport type='openvswitch'/>
+</network>
+

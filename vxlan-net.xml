@@ -1,0 +1,12 @@
+<network ipv6='yes'>
+  <name>vxlan_net</name>
+  <uuid>b1f5cfc2-5aa5-49d7-924c-df886a215023</uuid>
+  <bridge name='virbr2' stp='on' delay='0'/>
+  <mac address='52:54:00:ef:19:31'/>
+  <ip address='192.168.254.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.254.1' end='192.168.254.254'/>
+    </dhcp>
+  </ip>
+</network>
+
