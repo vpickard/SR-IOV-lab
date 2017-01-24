@@ -1,0 +1,110 @@
+[[local|localrc]]
+# put the log files in a dir different than the source so they can be manipulated independently
+LOGFILE=/opt/stack/logs/stack.sh.log
+SCREEN_LOGDIR=/opt/stack/logs
+LOG_COLOR=False
+# flip OFFLINE and RECLONE to lock (RECLONE=no) or update the source.
+OFFLINE=True
+RECLONE=no
+#OFFLINE=False
+#RECLONE=yes
+VERBOSE=True
+
+# disable everything so we can explicitly enable only what we need
+disable_all_services
+
+# Core compute (nova+vnc)
+enable_service n-cpu n-novnc
+# next line enables odl as the neutron backend rather than the l2 agent
+
+#Commented to see if this is affecting sr-iov
+#enable_service neutron 
+
+#Commented to see if this is affecting sr-iov
+#enable_service odl-compute
+
+
+# additional services. rabbit for rpm-based vm.
+enable_service rabbit
+
+#sr-iov
+enable_service q-sriov-agt
+
+
+HOST_IP=10.8.125.19
+HOST_NAME=odl32
+SERVICE_HOST_NAME=odl31
+SERVICE_HOST=10.8.125.240
+Q_HOST=$SERVICE_HOST
+
+#Commented to see if this is affecting sr-iov
+#enable_plugin networking-odl http://git.openstack.org/openstack/networking-odl stable/newton
+#
+# PORT and IP are only needed if using manual mode and external ODL. allinone uses defaults.
+#
+#Commented to see if this is affecting sr-iov
+#ODL_MODE=manual
+#ODL_MGR_IP=10.8.125.240
+#ODL_PORT=8080
+SKIP_OVS_INSTALL=True
+
+## Neutron Options
+#ENABLE_TENANT_TUNNELS=False
+#ENABLE_TENANT_VLANS=True
+#TENANT_VLAN_RANGE=2901:2905
+#PHYSICAL_NETWORK=physnet1
+
+### Neutron Networking options used to create Neutron Subnets
+#PROVIDER_NETWORK_TYPE="vlan"
+#SEGMENTATION_ID=2010
+
+## SR-IOV
+PHYSICAL_NETWORK=physnet1
+
+
+# ML2 SR-IOV agent configuration
+enable_plugin neutron git://git.openstack.org/openstack/neutron.git stable/newton
+PHYSICAL_DEVICE_MAPPINGS=physnet1:em2
+#EXCLUDE_DEVICES=em1:0000:01:10.0
+
+VNCSERVER_PROXYCLIENT_ADDRESS=$HOST_IP
+VNCSERVER_LISTEN=0.0.0.0
+
+DATABASE_PASSWORD=mysql
+RABBIT_PASSWORD=rabbit
+QPID_PASSWORD=rabbit
+SERVICE_TOKEN=service
+SERVICE_PASSWORD=admin
+ADMIN_PASSWORD=admin
+
+# use master for latest
+#BRANCH=master
+BRANCH=stable/newton
+GLANCE_BRANCH=$BRANCH
+HORIZON_BRANCH=$BRANCH
+KEYSTONE_BRANCH=$BRANCH
+NOVA_BRANCH=$BRANCH
+NEUTRON_BRANCH=$BRANCH
+SWIFT_BRANCH=$BRANCH
+##CLIFF_BRANCH=$BRANCH
+##TEMPEST_BRANCH=$BRANCH
+CINDER_BRANCH=$BRANCH
+HEAT_BRANCH=$BRANCH
+TROVE_BRANCH=$BRANCH
+CEILOMETER_BRANCH=$BRANCH
+
+# Add PCI Passthru filter, add alias, add all ports on PF, except 1 used for test vm
+[[post-config|$NOVA_CONF]]
+[DEFAULT]
+# pcidatabase.com - Intel 82599 (vf device id = 0x10ed, product/vendor id = 0x8086
+#pci_alias={\\"name\\":\\"82599vf\\",\\"product_id\\":\\"10ed\\",\\"vendor_id\\":\\"8086\\"}
+pci_passthrough_whitelist={\\"devname\\":\\"em2\\",\\"physical_network\\":\\"physnet1\\"}
+
+#Fix for "no hosts available error" when spawning sriov vm... added pcipassthrough and aggregateInstance 12/20/16
+scheduler_default_filters=RetryFilter,AvailabilityZoneFilter,RamFilter,DiskFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter,SameHostFilter,DifferentHostFilter,PciPassthroughFilter,AggregateInstanceExtraSpecsFilter
+scheduler_available_filters=nova.scheduler.filters.all_filters
+
+
+[[post-config|/etc/neutron/plugins/ml2/ml2_conf.ini]]
+[agent]
+minimize_polling=True
